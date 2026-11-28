@@ -41,11 +41,10 @@
             }
             #canvas {
                 display: block;
-                position: static !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                border: 0 !important;
-                transform: none !important;
+                flex: none;
+                margin: 0;
+                padding: 0;
+                border: 0;
                 touch-action: none;
                 -ms-touch-action: none;
                 outline: none;
@@ -60,49 +59,39 @@
         </div>
         <script type="text/javascript">
             (function () {
-                var FW = 960;
-                var FH = 540;
+                var canvas = document.getElementById("canvas");
 
-                function medir() {
+                function ajustar() {
                     var vv = window.visualViewport;
-                    var de = document.documentElement;
-                    var w = Math.floor(vv ? vv.width : de.clientWidth);
-                    var h = Math.floor(vv ? vv.height : de.clientHeight);
+                    var w = Math.floor(vv ? vv.width : document.documentElement.clientWidth);
+                    var h = Math.floor(vv ? vv.height : document.documentElement.clientHeight);
                     if (w < 1 || h < 1) return;
-                    if (w / h > 16 / 9) {
-                        FH = h;
-                        FW = Math.floor(h * 16 / 9);
-                    } else {
-                        FW = w;
-                        FH = Math.floor(w * 9 / 16);
+                    var cw = w;
+                    var ch = Math.floor(w * 9 / 16);
+                    if (ch > h) {
+                        ch = h;
+                        cw = Math.floor(h * 16 / 9);
                     }
+                    canvas.style.setProperty("width", cw + "px", "important");
+                    canvas.style.setProperty("height", ch + "px", "important");
                 }
 
-                medir();
-
-                Object.defineProperty(window, "innerWidth", { get: function () { return FW; }, configurable: true });
-                Object.defineProperty(window, "innerHeight", { get: function () { return FH; }, configurable: true });
-
-                function refrescar() {
-                    medir();
-                    setTimeout(function () {
-                        medir();
-                        window.dispatchEvent(new Event("resize"));
-                    }, 200);
+                function ajustarYAvisar() {
+                    ajustar();
+                    window.dispatchEvent(new Event("resize"));
                 }
 
-                window.addEventListener("resize", medir);
-                window.addEventListener("orientationchange", refrescar);
-                if (window.visualViewport) {
-                    window.visualViewport.addEventListener("resize", medir);
-                }
+                ajustar();
 
-                document.addEventListener("gesturestart", function (e) { e.preventDefault(); });
-                document.addEventListener("touchmove", function (e) { e.preventDefault(); }, { passive: false });
-                document.addEventListener("contextmenu", function (e) { e.preventDefault(); });
-            })();
-        </script>
-        <script type="text/javascript" src="html5game/BarberoGarcíaMario_Juego_AppsWeb_SinMejoras.js?cachebust=1923245636"></script>
-        <script>window.onload = GameMaker_Init;</script>
-    </body>
-</html>
+                window.addEventListener("load", function () {
+                    ajustarYAvisar();
+                    setTimeout(ajustarYAvisar, 300);
+                    setTimeout(ajustarYAvisar, 1000);
+                });
+
+                var pendiente = null;
+                function programar() {
+                    ajustar();
+                    clearTimeout(pendiente);
+                    pendiente = setTimeout(ajustarYAvisar, 150);
+                }
