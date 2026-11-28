@@ -99,11 +99,11 @@
                     var w = Math.floor(vv ? vv.width : document.documentElement.clientWidth);
                     var h = Math.floor(vv ? vv.height : document.documentElement.clientHeight);
                     if (w < 1 || h < 1) return;
-                    var cw = w;
-                    var ch = Math.floor(w * 9 / 16);
+                    var cw = Math.min(960, w);
+                    var ch = Math.floor(cw * 9 / 16);
                     if (ch > h) {
-                        ch = h;
-                        cw = Math.floor(h * 16 / 9);
+                        ch = Math.min(540, h);
+                        cw = Math.floor(ch * 16 / 9);
                     }
                     canvas.style.setProperty("width", cw + "px", "important");
                     canvas.style.setProperty("height", ch + "px", "important");
