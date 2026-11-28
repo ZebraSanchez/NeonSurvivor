@@ -93,11 +93,21 @@
                 var canvas = document.getElementById("canvas");
                 var iniciado = false;
                 var pendiente = null;
+                var ultimoW = 0;
+                var ultimoH = 0;
+
+                function medida() {
+                    var vv = window.visualViewport;
+                    return {
+                        w: Math.floor(vv ? vv.width : document.documentElement.clientWidth),
+                        h: Math.floor(vv ? vv.height : document.documentElement.clientHeight)
+                    };
+                }
 
                 function ajustar() {
-                    var vv = window.visualViewport;
-                    var w = Math.floor(vv ? vv.width : document.documentElement.clientWidth);
-                    var h = Math.floor(vv ? vv.height : document.documentElement.clientHeight);
+                    var m = medida();
+                    var w = m.w;
+                    var h = m.h;
                     if (w < 1 || h < 1) return;
                     var cw = w;
                     var ch = Math.floor(w * 9 / 16);
@@ -107,6 +117,8 @@
                     }
                     canvas.style.setProperty("width", cw + "px", "important");
                     canvas.style.setProperty("height", ch + "px", "important");
+                    ultimoW = w;
+                    ultimoH = h;
                 }
 
                 function avisar() {
@@ -122,6 +134,13 @@
                     pendiente = setTimeout(avisar, 200);
                 }
 
+                function rafaga() {
+                    var esperas = [100, 300, 600, 1000, 1500, 2000, 3000];
+                    for (var i = 0; i < esperas.length; i++) {
+                        setTimeout(function () { ajustar(); avisar(); }, esperas[i]);
+                    }
+                }
+
                 ajustar();
 
                 window.addEventListener("resize", function (e) {
@@ -129,11 +148,19 @@
                 });
                 window.addEventListener("orientationchange", function () {
                     programar();
-                    setTimeout(programar, 500);
+                    rafaga();
                 });
                 if (window.visualViewport) {
                     window.visualViewport.addEventListener("resize", programar);
                 }
+
+                setInterval(function () {
+                    var m = medida();
+                    if (m.w !== ultimoW || m.h !== ultimoH) {
+                        ajustar();
+                        avisar();
+                    }
+                }, 500);
 
                 document.addEventListener("gesturestart", function (e) { e.preventDefault(); });
                 document.addEventListener("touchmove", function (e) { e.preventDefault(); }, { passive: false });
@@ -178,7 +205,7 @@
                 setInterval(pintar, 500);
             })();
         </script>
-        <script type="text/javascript" src="html5game/BarberoGarcíaMario_Juego_AppsWeb_SinMejoras.js?cachebust=1923245638"></script>
+        <script type="text/javascript" src="html5game/BarberoGarcíaMario_Juego_AppsWeb_SinMejoras.js?cachebust=1923245640"></script>
         <script>window.onload = arrancarNeon;</script>
     </body>
 </html>
