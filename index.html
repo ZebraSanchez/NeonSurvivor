@@ -49,9 +49,25 @@
                 -ms-touch-action: none;
                 outline: none;
             }
+            #errores {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 99999;
+                margin: 0;
+                padding: 4px 6px;
+                font: 12px monospace;
+                color: #ff5555;
+                background: rgba(0, 0, 0, 0.8);
+                white-space: pre-wrap;
+                pointer-events: none;
+                display: none;
+            }
         </style>
     </head>
     <body>
+        <div id="errores"></div>
         <div class="gm4html5_div_class" id="gm4html5_div_id">
             <canvas id="canvas" width="960" height="540">
                 <p>Your browser doesn't support HTML5 canvas.</p>
@@ -59,7 +75,24 @@
         </div>
         <script type="text/javascript">
             (function () {
+                var caja = document.getElementById("errores");
+                function mostrar(txt) {
+                    caja.style.display = "block";
+                    caja.textContent += txt + "\n";
+                }
+                window.addEventListener("error", function (e) {
+                    mostrar("ERROR: " + e.message + " (" + (e.filename || "").split("/").pop() + ":" + e.lineno + ")");
+                });
+                window.addEventListener("unhandledrejection", function (e) {
+                    mostrar("PROMESA: " + (e.reason && e.reason.message ? e.reason.message : e.reason));
+                });
+            })();
+        </script>
+        <script type="text/javascript">
+            (function () {
                 var canvas = document.getElementById("canvas");
+                var iniciado = false;
+                var pendiente = null;
 
                 function ajustar() {
                     var vv = window.visualViewport;
@@ -76,22 +109,45 @@
                     canvas.style.setProperty("height", ch + "px", "important");
                 }
 
-                function ajustarYAvisar() {
+                function avisar() {
+                    if (!iniciado) return;
+                    try {
+                        window.dispatchEvent(new Event("resize"));
+                    } catch (err) {}
+                }
+
+                function programar() {
                     ajustar();
-                    window.dispatchEvent(new Event("resize"));
+                    clearTimeout(pendiente);
+                    pendiente = setTimeout(avisar, 200);
                 }
 
                 ajustar();
 
-                window.addEventListener("load", function () {
-                    ajustarYAvisar();
-                    setTimeout(ajustarYAvisar, 300);
-                    setTimeout(ajustarYAvisar, 1000);
+                window.addEventListener("resize", function (e) {
+                    if (e.isTrusted) programar();
                 });
-
-                var pendiente = null;
-                function programar() {
-                    ajustar();
-                    clearTimeout(pendiente);
-                    pendiente = setTimeout(ajustarYAvisar, 150);
+                window.addEventListener("orientationchange", function () {
+                    programar();
+                    setTimeout(programar, 500);
+                });
+                if (window.visualViewport) {
+                    window.visualViewport.addEventListener("resize", programar);
                 }
+
+                document.addEventListener("gesturestart", function (e) { e.preventDefault(); });
+                document.addEventListener("touchmove", function (e) { e.preventDefault(); }, { passive: false });
+                document.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+
+                window.arrancarNeon = function () {
+                    GameMaker_Init();
+                    iniciado = true;
+                    setTimeout(function () { ajustar(); avisar(); }, 600);
+                    setTimeout(function () { ajustar(); avisar(); }, 1500);
+                };
+            })();
+        </script>
+        <script type="text/javascript" src="html5game/BarberoGarcíaMario_Juego_AppsWeb_SinMejoras.js?cachebust=1923245638"></script>
+        <script>window.onload = arrancarNeon;</script>
+    </body>
+</html>
