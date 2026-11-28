@@ -49,45 +49,14 @@
                 -ms-touch-action: none;
                 outline: none;
             }
-            #errores {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                z-index: 99999;
-                margin: 0;
-                padding: 4px 6px;
-                font: 12px monospace;
-                color: #ff5555;
-                background: rgba(0, 0, 0, 0.8);
-                white-space: pre-wrap;
-                pointer-events: none;
-                display: none;
-            }
         </style>
     </head>
     <body>
-        <div id="errores"></div>
         <div class="gm4html5_div_class" id="gm4html5_div_id">
             <canvas id="canvas" width="960" height="540">
                 <p>Your browser doesn't support HTML5 canvas.</p>
             </canvas>
         </div>
-        <script type="text/javascript">
-            (function () {
-                var caja = document.getElementById("errores");
-                function mostrar(txt) {
-                    caja.style.display = "block";
-                    caja.textContent += txt + "\n";
-                }
-                window.addEventListener("error", function (e) {
-                    mostrar("ERROR: " + e.message + " (" + (e.filename || "").split("/").pop() + ":" + e.lineno + ")");
-                });
-                window.addEventListener("unhandledrejection", function (e) {
-                    mostrar("PROMESA: " + (e.reason && e.reason.message ? e.reason.message : e.reason));
-                });
-            })();
-        </script>
         <script type="text/javascript">
             (function () {
                 var canvas = document.getElementById("canvas");
@@ -147,38 +116,7 @@
                 };
             })();
         </script>
-        <script type="text/javascript">
-            (function () {
-                if (location.search.indexOf("debug") < 0) return;
-                var d = document.createElement("div");
-                d.style.cssText = "position:fixed;left:0;bottom:0;z-index:99999;background:rgba(0,0,0,.8);color:#0f0;font:11px monospace;padding:4px;white-space:pre;pointer-events:none";
-                document.body.appendChild(d);
-                var cv = document.getElementById("canvas");
-                var ult = "toca la pantalla";
-                function pintar() {
-                    var r = cv.getBoundingClientRect();
-                    var vv = window.visualViewport;
-                    d.textContent =
-                        "inner " + innerWidth + "x" + innerHeight +
-                        "  vv " + (vv ? Math.round(vv.width) + "x" + Math.round(vv.height) : "-") + "\n" +
-                        "rect x" + Math.round(r.left) + " y" + Math.round(r.top) +
-                        " " + Math.round(r.width) + "x" + Math.round(r.height) + "\n" + ult;
-                }
-                function toque(e) {
-                    var t = e.touches ? e.touches[0] : e;
-                    var r = cv.getBoundingClientRect();
-                    var lx = Math.round((t.clientX - r.left) * 960 / r.width);
-                    var ly = Math.round((t.clientY - r.top) * 540 / r.height);
-                    ult = "dedo " + Math.round(t.clientX) + "," + Math.round(t.clientY) + "  ESPERADO " + lx + "," + ly;
-                    pintar();
-                }
-                document.addEventListener("touchstart", toque, true);
-                document.addEventListener("mousedown", toque, true);
-                window.addEventListener("resize", pintar);
-                setInterval(pintar, 500);
-            })();
-        </script>
-        <script type="text/javascript" src="html5game/BarberoGarcíaMario_Juego_AppsWeb_SinMejoras.js?cachebust=1923245642"></script>
+        <script type="text/javascript" src="html5game/BarberoGarcíaMario_Juego_AppsWeb_SinMejoras.js?cachebust=1923245643"></script>
         <script>window.onload = arrancarNeon;</script>
     </body>
 </html>
